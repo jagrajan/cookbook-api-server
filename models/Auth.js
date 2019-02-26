@@ -34,7 +34,7 @@ export const login = async (email, password, fingerprint) => {
 
 export const validateToken = async (token, fingerprint) => {
   const res = await query('SELECT * FROM users.auth_key WHERE id=$1',
-    array(token));
+    [token]);
   
   if (res.rowCount < 1) {
     return {
