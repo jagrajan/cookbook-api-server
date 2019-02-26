@@ -26,8 +26,29 @@ export const login = async (email, password, fingerprint) => {
 
   const token = await query(`INSERT INTO users.auth_key
     (user_id, expire_on, fingerprint, admin) VALUES
-    ($1, NOW() + interval '1 day', $2, $3) RETURNING id`,
+    ($1, NOW() + interval '1 day', $2, $3) RETURNING *`,
     [user.id, fingerprint, user.admin]);
 
-  return token.rows[0].id;
+  return token.rows[0];
+}
+
+export const validateToken = async (token, fingerprint) => {
+  const res = await query('SELECT * FROM users.auth_key WHERE id=$1',
+    array(token));
+  
+  if (res.rowCount < 1) {
+    return {
+      error: 'invalid-token'
+    };
+  }
+
+  const tokenData = res.rows[0];
+
+  if (fingerprint !== tokenData.fingerprint) {
+    return {
+      error: 'invalid-token'
+    };
+  }
+
+  return tokenData;
 }
