@@ -1,7 +1,7 @@
 import { query } from '../db';
 import { compare } from 'bcrypt';
 
-export const login = async (email, password, fingerprint) => {
+export const login = async (email, password) => {
   const res = await query(`SELECT id, email, password,
     CASE
       when id IN (
@@ -25,14 +25,14 @@ export const login = async (email, password, fingerprint) => {
   }
 
   const token = await query(`INSERT INTO users.auth_key
-    (user_id, expire_on, fingerprint, admin) VALUES
-    ($1, NOW() + interval '1 day', $2, $3) RETURNING *`,
-    [user.id, fingerprint, user.admin]);
+    (user_id, expire_on, admin) VALUES
+    ($1, NOW() + interval '1 day', $2) RETURNING *`,
+    [user.id, user.admin]);
 
   return token.rows[0];
 }
 
-export const validateToken = async (token, fingerprint) => {
+export const validateToken = async (token) => {
   const res = await query('SELECT * FROM users.auth_key WHERE id=$1',
     [token]);
   
@@ -43,12 +43,5 @@ export const validateToken = async (token, fingerprint) => {
   }
 
   const tokenData = res.rows[0];
-
-  if (fingerprint !== tokenData.fingerprint) {
-    return {
-      error: 'invalid-token'
-    };
-  }
-
   return tokenData;
 }
