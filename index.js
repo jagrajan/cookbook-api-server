@@ -7,7 +7,12 @@ import { query } from './db';
 import { getAllUsers, createUser } from './models/User';
 import { login, validateToken } from './models/Auth';
 
+import { get } from './cache/auth-cache';
+
+get('foo').then(val => console.log(val)).catch(err => console.log(err));
+
 const app = express();
+
 
 app.use(cookieSession({
   keys: [process.env.COOKIE_KEY]
