@@ -1,6 +1,7 @@
 import 'babel-polyfill';
 import express from 'express';
 import cookieSession from 'cookie-session';
+import morgan from 'morgan';
 
 import router from './routes';
 import { query } from './db';
@@ -13,6 +14,8 @@ get('foo').then(val => console.log(val)).catch(err => console.log(err));
 
 const app = express();
 
+app.use(morgan());
+
 
 app.use(cookieSession({
   keys: [process.env.COOKIE_KEY]
@@ -24,4 +27,4 @@ app.use((req, res) => {
   res.status(404).json({ error: 'not-found' });
 });
 
-app.listen(3000, () => console.log('App started.'));
+app.listen(process.env.PORT, () => console.log(`App started on port ${process.env.PORT}.`));

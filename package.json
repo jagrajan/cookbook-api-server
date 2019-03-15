@@ -36,6 +36,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "devDependencies": {
+    "morgan": "^1.9.1",
     "nodemon": "^1.18.10",
     "source-map-support": "^0.5.10"
   }
