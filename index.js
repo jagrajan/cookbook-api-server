@@ -2,6 +2,7 @@ import 'babel-polyfill';
 import express from 'express';
 import cookieSession from 'cookie-session';
 import morgan from 'morgan';
+import bodyParser from 'body-parser';
 
 import router from './routes';
 import { query } from './db';
@@ -16,6 +17,9 @@ const app = express();
 
 app.use(morgan());
 
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 app.use(cookieSession({
   keys: [process.env.COOKIE_KEY]

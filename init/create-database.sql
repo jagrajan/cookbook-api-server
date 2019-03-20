@@ -29,7 +29,6 @@ BEGIN;
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     user_id     UUID                                        NOT NULL REFERENCES users.profile(id),
     expire_on   TIMESTAMP WITHOUT TIME ZONE                 NOT NULL,
-    fingerprint TEXT                                        NOT NULL,
     admin       BOOLEAN DEFAULT false
   );
 
