@@ -3,8 +3,11 @@ import { login } from '../../models/Auth';
 
 const router = Router();
 
+router.get('/status', (req, res) => {
+  return res.json(req.session.token);
+});
+
 router.post('/login', (req, res) => {
-  console.log(req.body);
   let { email, password } = req.body;
 
   if (email == null || email == '') {
@@ -23,7 +26,10 @@ router.post('/login', (req, res) => {
   }
 
   login(email, password)
-    .then(token => res.json(token))
+    .then(token => {
+      req.session.token = token;
+      return res.json(token);
+    })
     .catch(error => res.json(error));
 });
 

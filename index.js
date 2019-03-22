@@ -3,6 +3,7 @@ import express from 'express';
 import cookieSession from 'cookie-session';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 
 import router from './routes';
 import { query } from './db';
@@ -15,15 +16,25 @@ get('foo').then(val => console.log(val)).catch(err => console.log(err));
 
 const app = express();
 
-app.use(morgan());
+app.set('trust proxy', 1);
+app.use(cors());
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 
 app.use(cookieSession({
-  keys: [process.env.COOKIE_KEY]
+  name: 'session',
+  keys: [process.env.COOKIE_KEY],
+  maxAge: 24 * 60 * 60  * 1000 //24 hours
 }));
+
+app.use((req, res, next) => {
+  console.log(req.session);
+  next();
+});
 
 app.use(router);
 
