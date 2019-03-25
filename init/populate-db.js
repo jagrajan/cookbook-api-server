@@ -1,13 +1,19 @@
 require('dotenv').config();
 
 const { createUser } = require('../models/User');
+const { createIngredient } = require('../models/Ingredient');
 
 const populate = async () => {
-  const id = await createUser('jag@jagrajan.com', 'password');
+  let id = await createUser('jag@jagrajan.com', 'password', 'jag');
   console.log(`Created user with id ${id}`);
+  id = await createUser('cat.holtz@hotmail.com', 'password', 'catherine');
+  console.log(`Created user with id ${id}`);
+
+  id = await createIngredient('Mushrooms');
+  console.log(`Created ingredient with id ${id}`);
 }
 
-populate().finally(() => {
+populate().catch(err => console.error(err)).finally(() => {
   console.info('Database population complete!');
   process.exit();
 });

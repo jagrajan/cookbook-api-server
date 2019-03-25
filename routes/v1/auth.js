@@ -1,13 +1,21 @@
 import { Router } from 'express';
+import asyncHandler from 'express-async-handler';
+
+import { set } from '../../cache/auth-cache';
 import { login } from '../../models/Auth';
 
 const router = Router();
 
 router.get('/status', (req, res) => {
-  return res.json(req.session.token);
+  return res.json(req.user);
 });
 
-router.post('/login', (req, res) => {
+router.get('/logout', (req, res) => {
+  req.session = null;
+  return res.json({ success: 'logged-out' });
+});
+
+router.post('/login', asyncHandler(async (req, res, next) => {
   let { email, password } = req.body;
 
   if (email == null || email == '') {
@@ -25,12 +33,14 @@ router.post('/login', (req, res) => {
     });
   }
 
-  login(email, password)
-    .then(token => {
-      req.session.token = token;
-      return res.json(token);
-    })
-    .catch(error => res.json(error));
-});
+  const token = await login(email, password);
+  if (!req.error) {
+    set(token.id, token);
+    req.session.token = token.id;
+  }
+
+  return res.json(token);
+
+}));
 
 export default router;

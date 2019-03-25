@@ -4,7 +4,13 @@ BEGIN;
 
   CREATE SCHEMA IF NOT EXISTS users;
   CREATE SCHEMA IF NOT EXISTS admin;
+  CREATE SCHEMA IF NOT EXISTS cookbook;
 
+  DROP TABLE IF EXISTS cookbook.ingredient;
+  DROP TABLE IF EXISTS cookbook.recipe_category;
+  DROP TABLE IF EXISTS cookbook.ingredient_category;
+  DROP TABLE IF EXISTS cookbook.unit;
+  DROP TABLE IF EXISTS cookbook.recipe;
   DROP TABLE IF EXISTS admin.admin;
   DROP TABLE IF EXISTS users.auth_key;
   DROP TABLE IF EXISTS users.profile;
@@ -21,8 +27,9 @@ BEGIN;
 
   CREATE TABLE users.profile (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-    email       VARCHAR(100)                                NOT NULL,
-    password    TEXT                                        NOT NULL
+    email       TEXT                                        NOT NULL,
+    password    TEXT                                        NOT NULL,
+    name        TEXT                                                
   );
 
   CREATE TABLE users.auth_key (
@@ -36,6 +43,34 @@ BEGIN;
     user_id     UUID PRIMARY KEY                            NOT NULL REFERENCES users.profile(id),
     expire_on   TIMESTAMP WITHOUT TIME ZONE,
     master      BOOLEAN DEFAULT false
+  );
+
+  CREATE TABLE cookbook.unit (
+    id    SERIAL PRIMARY KEY  NOT NULL,
+    name  TEXT                NOT NULL
+  );
+
+  CREATE TABLE cookbook.ingredient_category (
+    id    SERIAL PRIMARY KEY  NOT NULL,
+    name  TEXT                NOT NULL
+  );
+
+  CREATE TABLE cookbook.ingredient (
+    id        SERIAL PRIMARY KEY  NOT NULL,
+    name      TEXT                NOT NULL,
+    unit      INTEGER             REFERENCES cookbook.unit(id),
+    category  INTEGER             REFERENCES cookbook.ingredient_category(id)
+  );
+
+  CREATE TABLE cookbook.recipe (
+    id            SERIAL PRIMARY KEY  NOT NULL,
+    description   TEXT,
+    user_id       UUID            REFERENCES users.profile(id)
+  );
+
+  CREATE TABLE cookbook.recipe_category (
+    id    SERIAL PRIMARY KEY  NOT NULL,
+    name  TEXT                NOT NULL
   );
 
   DO $$

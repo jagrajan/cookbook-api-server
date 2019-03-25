@@ -11,11 +11,11 @@ client.on('error', err => {
   error(`Redis: ${err}`)
 });
 
-export const set = async (key, value) => {
-  await client.set(key, value);
+export const set = async (token, data) => {
+  await client.set(token, JSON.stringify(data));
 }
 
-export const get = async (key) => {
-  const value = await client.get(key);
-  return value;
+export const get = async (token) => {
+  const value = await client.get(token);
+  return JSON.parse(value);
 }
