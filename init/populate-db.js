@@ -11,6 +11,10 @@ const populate = async () => {
 
   id = await createIngredient('Mushrooms');
   console.log(`Created ingredient with id ${id}`);
+  id = await createIngredient('Crimini Mushrooms');
+  console.log(`Created ingredient with id ${id}`);
+  id = await createIngredient('White Mushrooms');
+  console.log(`Created ingredient with id ${id}`);
 }
 
 populate().catch(err => console.error(err)).finally(() => {
