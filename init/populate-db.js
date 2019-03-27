@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const { createUser } = require('../models/User');
 const { createIngredient } = require('../models/Ingredient');
+const { createUnit } = require('../models/Unit');
 
 const populate = async () => {
   let id = await createUser('jag@jagrajan.com', 'password', 'jag');
@@ -15,6 +16,11 @@ const populate = async () => {
   console.log(`Created ingredient with id ${id}`);
   id = await createIngredient('White Mushrooms');
   console.log(`Created ingredient with id ${id}`);
+
+  id = await createUnit('Cup');
+  console.log(`Created unit with id ${id}`);
+  id = await createUnit('Teaspoon');
+  console.log(`Created unit with id ${id}`);
 }
 
 populate().catch(err => console.error(err)).finally(() => {
