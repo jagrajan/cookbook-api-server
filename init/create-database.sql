@@ -6,6 +6,9 @@ BEGIN;
   CREATE SCHEMA IF NOT EXISTS admin;
   CREATE SCHEMA IF NOT EXISTS cookbook;
 
+  DROP TABLE IF EXISTS cookbook.measured_ingredient;
+  DROP TABLE IF EXISTS cookbook.recipe_step;
+  DROP TABLE IF EXISTS cookbook.recipe_version;
   DROP TABLE IF EXISTS cookbook.ingredient;
   DROP TABLE IF EXISTS cookbook.recipe_category;
   DROP TABLE IF EXISTS cookbook.ingredient_category;
@@ -63,14 +66,42 @@ BEGIN;
   );
 
   CREATE TABLE cookbook.recipe (
-    id            SERIAL PRIMARY KEY  NOT NULL,
+    id                SERIAL PRIMARY KEY  NOT NULL,
+    released_version  INTEGER DEFAULT 0,
+    latest_version    INTEGER DEFAULT 1,
+    hidden            BOOLEAN DEFAULT false,
+    slug              TEXT
+  );
+
+  CREATE TABLE cookbook.recipe_version (
+    id            SERIAL PRIMARY KEY,
+    name          TEXT                NOT NULL,
     description   TEXT,
-    user_id       UUID            REFERENCES users.profile(id)
+    introduction  TEXT,
+    recipe_id     INTEGER             NOT NULL REFERENCES cookbook.recipe(id),
+    version       INTEGER             NOT NULL
   );
 
   CREATE TABLE cookbook.recipe_category (
     id    SERIAL PRIMARY KEY  NOT NULL,
     name  TEXT                NOT NULL
+  );
+
+  CREATE TABLE cookbook.recipe_step (
+    id                    SERIAL PRIMARY KEY,
+    recipe_version_id     INTEGER             NOT NULL REFERENCES cookbook.recipe_version(id),
+    position              INTEGER             NOT NULL,
+    description           TEXT
+  );
+
+  CREATE TABLE cookbook.measured_ingredient (
+    id                  SERIAL PRIMARY KEY,              
+    min_amount          TEXT,
+    max_amount          TEXT,
+    position            INTEGER,
+    ingredient_id       INTEGER               REFERENCES cookbook.ingredient(id),
+    recipe_version_id   INTEGER               REFERENCES cookbook.recipe_version(id),
+    unit_id             INTEGER               REFERENCES cookbook.unit(id)
   );
 
   DO $$
@@ -79,7 +110,7 @@ BEGIN;
     BEGIN
       FOR t IN
         SELECT * FROM pg_tables
-        WHERE schemaname IN ('admin', 'users')
+        WHERE schemaname IN ('admin', 'users', 'cookbook')
       LOOP
         EXECUTE format('ALTER TABLE %I.%I ' ||
           'ADD COLUMN create_date TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW();',

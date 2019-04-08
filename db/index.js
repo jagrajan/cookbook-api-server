@@ -32,3 +32,8 @@ export const query = async (query, params) => {
   info(`Result: ${JSON.stringify(res ? res.rows : res)}`);
   return res;
 };
+
+export const getClient = async () => {
+  const client = await pool.connect();
+  return client;
+};

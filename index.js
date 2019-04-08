@@ -7,7 +7,6 @@ import cors from 'cors';
 import asyncHandler from 'express-async-handler';
 
 import router from './routes';
-import { get } from './cache/auth-cache';
 import authMiddleware from './middleware/authenticate';
 
 const app = express();
@@ -17,9 +16,7 @@ app.use(cors());
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(bodyParser.json());
 
 app.use(cookieSession({
   name: 'session',
