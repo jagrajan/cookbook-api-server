@@ -78,6 +78,7 @@ BEGIN;
     name          TEXT                NOT NULL,
     description   TEXT,
     introduction  TEXT,
+    image_file    TEXT,
     recipe_id     INTEGER             NOT NULL REFERENCES cookbook.recipe(id),
     version       INTEGER             NOT NULL
   );

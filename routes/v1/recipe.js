@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import AsyncHandler from 'express-async-handler';
+import path from 'path';
+
+import { createImage } from '../../models/Image';
 
 import { 
   createRecipe, 
-  getAllRecipes, 
+  getAllRecipes,
+  getRecentlyUpdatedRecipes,
   getRecipe,
   incrementVersion,
   createRecipeVersion } from '../../models/Recipe';
@@ -27,8 +31,16 @@ router.get('/:id', AsyncHandler(async (req, res, next) => {
   return res.json({ error: 'not-found' });
 }));
 
+router.get('/recently-updated', AsyncHandler(async (req, res, next) => {
+  console.log(req.body);
+  const recipes = getRecentlyUpdatedRecipes(req.body.timestamp, req.body.count);
+  return res.json({
+    recipes
+  });
+}));
+
 router.put('/:id', AsyncHandler(async (req, res, next) => {
-  let { name, description, steps, ingredients } = req.body;
+  let { name, description, steps, ingredients, imageURL } = req.body;
   if (name == null) {
     return res.json({
       error: {
@@ -44,8 +56,14 @@ router.put('/:id', AsyncHandler(async (req, res, next) => {
       }
     });
   }
+  // console.log(imageURL);
+
+  // save the image and get the absolute location of the image file
+  const fullPath = await createImage(imageURL);
+  const imageFileName = path.basename(fullPath);
+
   const version = await incrementVersion(req.params.id);
-  const recipe = await createRecipeVersion(req.params.id, version, name, description, steps, ingredients);
+  const recipe = await createRecipeVersion(req.params.id, version, name, description, steps, ingredients, imageFileName);
   return res.json({
     recipe
   });
@@ -53,8 +71,7 @@ router.put('/:id', AsyncHandler(async (req, res, next) => {
 }));
 
 router.post('/create', AsyncHandler(async (req, res, next) => {
-  console.log(req.body);
-  let { name, description, steps, ingredients } = req.body;
+  let { name, description, steps, ingredients, imageURL } = req.body;
   if (name == null) {
     return res.json({
       error: {
@@ -71,9 +88,18 @@ router.post('/create', AsyncHandler(async (req, res, next) => {
     });
   }
 
+  // console.log(imageURL);
+
+  // save the image and get the absolute location of the image file
+  const fullPath = await createImage(imageURL);
+  const imageFileName = path.basename(fullPath);
+
+  // create the recipe itself
   const recipe = await createRecipe('test-recipe');
+
+  // create a recipe version
   const recipe_version = await createRecipeVersion(recipe.id, recipe.latest_version,
-    name, description, steps, ingredients);
+    name, description, steps, ingredients, imageFileName);
 
   return res.json({
     recipe: recipe_version

@@ -7,13 +7,23 @@ export const getAllRecipes = async () => {
   return res.rows;
 };
 
+export const getRecentlyUpdatedRecipes = async (timestamp, count) => {
+  const res = await (`SELECT rv.* FROM cookbook.recipe r
+  JOIN recipe_verion rv
+    ON r.id = rv.recipe_id AND r.latest_version = rv.version
+    WHERE rv.create_date < $1
+    LIMIT $2`, [timestamp, count]);
+  return res.rows;
+};
+
 export const getRecipe = async (id) => {
   const res = await query(`SELECT 
     recipe_id AS id,
     id AS recipe_version_id,
     name,
     description,
-    introduction
+    introduction,
+    image_file
   FROM cookbook.recipe_version 
   WHERE recipe_id = $1 
   ORDER BY version DESC
@@ -59,19 +69,22 @@ export const incrementVersion = async (id) => {
   return res.rows[0].latest_version;
 }
 
-export const createRecipeVersion = async (recipe_id, version, name, description, steps, ingredients) => {
+export const createRecipeVersion = async (recipe_id, version, name, description, steps, ingredients, image_file) => {
   const client = await getClient();
 
   try {
-    const res = await client.query(`INSERT INTO cookbook.recipe_version (recipe_id, version, name, description)
-      VALUES ($1, $2, $3, $4) RETURNING *`, [recipe_id, version, name, description]);
+    // create a new recipe version
+    const res = await client.query(`INSERT INTO cookbook.recipe_version (recipe_id, version, name, description, image_file)
+      VALUES ($1, $2, $3, $4, $5) RETURNING *`, [recipe_id, version, name, description, image_file]);
     const rv = res.rows[0];
+    // create each of the steps for that recipe version
     steps.forEach(async step => await client.query(`
       INSERT INTO cookbook.recipe_step (recipe_version_id, position, description)
         VALUES ($1, $2, $3)
     `, [rv.id, step.position, step.description]));
+
+    // create all the ingredients for that recipe version
     ingredients.forEach(async i => {
-      console.log(i);
       let ing = await client.query(`SELECT id FROM cookbook.ingredient WHERE name = $1`, [i.ingredient]);
       if (ing.rowCount == 0) {
         ing = await client.query(`INSERT INTO cookbook.ingredient (name) VALUES ($1) RETURNING id`, [i.ingredient]);

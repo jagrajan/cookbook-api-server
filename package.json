@@ -29,6 +29,7 @@
     "express": "^4.16.4",
     "express-async-handler": "^1.1.4",
     "express-fingerprint": "^1.1.2",
+    "image-data-uri": "^2.0.0",
     "node-cache": "^4.2.0",
     "npm-run-all": "^4.1.5",
     "pg": "^7.8.1",
