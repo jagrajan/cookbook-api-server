@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import AsyncHandler from 'express-async-handler';
 import path from 'path';
+import slugify from 'slugify';
 
 import { createImage } from '../../models/Image';
 
@@ -21,22 +22,29 @@ router.get('/', AsyncHandler(async (req, res, next) => {
   });
 }));
 
+
+router.get('/recently-updated', AsyncHandler(async (req, res, next) => {
+  const recipes = await getRecentlyUpdatedRecipes(req.query.timestamp, req.query.count);
+  return res.json({
+    recipes
+  });
+}));
+
+
 router.get('/:id', AsyncHandler(async (req, res, next) => {
-  const recipe = await getRecipe(req.params.id);
+  let id = req.params.id;
+  let slug = '';
+  if (id && isNaN(id)) {
+    slug = id;
+    id = 0;
+  }
+  const recipe = await getRecipe(id, slug);
   if (recipe) {
     return res.json({
       recipe
     });
   }
   return res.json({ error: 'not-found' });
-}));
-
-router.get('/recently-updated', AsyncHandler(async (req, res, next) => {
-  console.log(req.body);
-  const recipes = getRecentlyUpdatedRecipes(req.body.timestamp, req.body.count);
-  return res.json({
-    recipes
-  });
 }));
 
 router.put('/:id', AsyncHandler(async (req, res, next) => {
@@ -56,7 +64,6 @@ router.put('/:id', AsyncHandler(async (req, res, next) => {
       }
     });
   }
-  // console.log(imageURL);
 
   // save the image and get the absolute location of the image file
   const fullPath = await createImage(imageURL);
@@ -88,14 +95,19 @@ router.post('/create', AsyncHandler(async (req, res, next) => {
     });
   }
 
-  // console.log(imageURL);
-
   // save the image and get the absolute location of the image file
   const fullPath = await createImage(imageURL);
   const imageFileName = path.basename(fullPath);
 
-  // create the recipe itself
-  const recipe = await createRecipe('test-recipe');
+  // generate a slug
+  const slug = slugify(name, {
+    replacement: '-',
+    remove: /[*+~.()'"!:@]/g,
+    lower: true
+  });
+
+  // create the recipe 
+  const recipe = await createRecipe(slug);
 
   // create a recipe version
   const recipe_version = await createRecipeVersion(recipe.id, recipe.latest_version,

@@ -8,26 +8,29 @@ export const getAllRecipes = async () => {
 };
 
 export const getRecentlyUpdatedRecipes = async (timestamp, count) => {
-  const res = await (`SELECT rv.* FROM cookbook.recipe r
-  JOIN recipe_verion rv
+  const res = await query(`SELECT rv.*, r.slug FROM cookbook.recipe r
+  JOIN cookbook.recipe_version rv
     ON r.id = rv.recipe_id AND r.latest_version = rv.version
     WHERE rv.create_date < $1
+    ORDER BY rv.create_date DESC
     LIMIT $2`, [timestamp, count]);
   return res.rows;
 };
 
-export const getRecipe = async (id) => {
+export const getRecipe = async (id, slug = '') => {
   const res = await query(`SELECT 
-    recipe_id AS id,
-    id AS recipe_version_id,
-    name,
-    description,
-    introduction,
-    image_file
-  FROM cookbook.recipe_version 
-  WHERE recipe_id = $1 
-  ORDER BY version DESC
-  LIMIT 1`, [id]);
+    rv.recipe_id AS id,
+    rv.id AS recipe_version_id,
+    rv.name,
+    rv.description,
+    rv.introduction,
+    rv.image_file
+  FROM cookbook.recipe_version rv
+  JOIN cookbook.recipe r
+    ON r.id = rv.recipe_id
+  WHERE rv.recipe_id = $1 OR r.slug = $2
+  ORDER BY rv.version DESC
+  LIMIT 1`, [id, slug]);
   if (res.rowCount == 1) {
     const recipe = res.rows[0];
     const steps_res = await query(`SELECT * FROM cookbook.recipe_step
