@@ -5,8 +5,8 @@ export const getAllUnits = async () => {
   return res.rows;
 }
 
-export const createUnit = async (name) => {
-  const res = await query(`INSERT INTO cookbook.unit(name) 
-  VALUES ($1) RETURNING id`, [name]);
+export const createUnit = async (name, plural) => {
+  const res = await query(`INSERT INTO cookbook.unit(name, plural) 
+  VALUES ($1, $2) RETURNING id`, [name, plural]);
   return res.rows[0].id;
 }

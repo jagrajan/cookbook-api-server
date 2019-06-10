@@ -17,9 +17,9 @@ const populate = async () => {
   id = await createIngredient('White Mushrooms');
   console.log(`Created ingredient with id ${id}`);
 
-  id = await createUnit('Cup');
+  id = await createUnit('Cup', 'Cups');
   console.log(`Created unit with id ${id}`);
-  id = await createUnit('Teaspoon');
+  id = await createUnit('Teaspoon', 'Teaspoons');
   console.log(`Created unit with id ${id}`);
 }
 

@@ -50,8 +50,9 @@ BEGIN;
   );
 
   CREATE TABLE cookbook.unit (
-    id    SERIAL PRIMARY KEY  NOT NULL,
-    name  TEXT                NOT NULL
+    id      SERIAL PRIMARY KEY  NOT NULL,
+    name    TEXT                NOT NULL,
+    plural  TEXT      
   );
 
   CREATE TABLE cookbook.ingredient_category (

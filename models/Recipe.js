@@ -40,9 +40,13 @@ export const getRecipe = async (id, slug = '') => {
         m.min_amount,
         m.max_amount,
         m.unit_id,
-        i.name
+        i.name,
+        i.id AS ingredient_id,
+        u.name AS singular_unit,
+        u.plural AS plural_unit
       FROM cookbook.measured_ingredient m
       JOIN cookbook.ingredient i ON i.id = m.ingredient_id
+      JOIN cookbook.unit u ON u.id = m.unit_id
       WHERE recipe_version_id = $1 ORDER BY position ASC`, [recipe.recipe_version_id]);
     const ingredients = ingredients_res.rows;
     return {
