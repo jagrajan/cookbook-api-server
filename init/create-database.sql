@@ -51,7 +51,7 @@ BEGIN;
 
   CREATE TABLE cookbook.unit (
     id      SERIAL PRIMARY KEY  NOT NULL,
-    name    TEXT                NOT NULL,
+    name    TEXT,
     plural  TEXT      
   );
 
@@ -63,6 +63,7 @@ BEGIN;
   CREATE TABLE cookbook.ingredient (
     id        SERIAL PRIMARY KEY  NOT NULL,
     name      TEXT                NOT NULL,
+    plural    TEXT                NOT NULL,
     unit      INTEGER             REFERENCES cookbook.unit(id),
     category  INTEGER             REFERENCES cookbook.ingredient_category(id)
   );

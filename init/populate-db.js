@@ -10,17 +10,19 @@ const populate = async () => {
   id = await createUser('cat.holtz@hotmail.com', 'password', 'catherine');
   console.log(`Created user with id ${id}`);
 
-  id = await createIngredient('Mushrooms');
+  id = await createIngredient('Mushroom', 'Mushrooms');
   console.log(`Created ingredient with id ${id}`);
-  id = await createIngredient('Crimini Mushrooms');
+  id = await createIngredient('Crimini Mushroom', 'Crimini Mushrooms');
   console.log(`Created ingredient with id ${id}`);
-  id = await createIngredient('White Mushrooms');
+  id = await createIngredient('White Mushroom');
   console.log(`Created ingredient with id ${id}`);
 
   id = await createUnit('Cup', 'Cups');
   console.log(`Created unit with id ${id}`);
   id = await createUnit('Teaspoon', 'Teaspoons');
   console.log(`Created unit with id ${id}`);
+  id = await createUnit('', '');
+  console.log(`Created unti with id ${id}`);
 }
 
 populate().catch(err => console.error(err)).finally(() => {

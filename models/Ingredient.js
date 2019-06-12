@@ -5,8 +5,11 @@ export const getAllIngredients = async () => {
   return res.rows;
 };
 
-export const createIngredient = async(name) => {
-  const res = await query(`INSERT INTO cookbook.ingredient(name) 
-  VALUES ($1) RETURNING *`, [name]);
+export const createIngredient = async(name, plural = '') => {
+  if (plural == '') {
+    plural = name;
+  }
+  const res = await query(`INSERT INTO cookbook.ingredient(name, plural) 
+  VALUES ($1, $2) RETURNING *`, [name, plural]);
   return res.rows[0].id
 }

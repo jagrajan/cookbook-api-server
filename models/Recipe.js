@@ -41,6 +41,7 @@ export const getRecipe = async (id, slug = '') => {
         m.max_amount,
         m.unit_id,
         i.name,
+        i.plural,
         i.id AS ingredient_id,
         u.name AS singular_unit,
         u.plural AS plural_unit
