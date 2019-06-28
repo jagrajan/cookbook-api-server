@@ -48,7 +48,7 @@ router.get('/:id', AsyncHandler(async (req, res, next) => {
 }));
 
 router.put('/:id', AsyncHandler(async (req, res, next) => {
-  let { name, description, steps, ingredients, imageURL } = req.body;
+  let { name, description, introduction, steps, ingredients, imageURL } = req.body;
   if (name == null) {
     return res.json({
       error: {
@@ -70,7 +70,8 @@ router.put('/:id', AsyncHandler(async (req, res, next) => {
   const imageFileName = path.basename(fullPath);
 
   const version = await incrementVersion(req.params.id);
-  const recipe = await createRecipeVersion(req.params.id, version, name, description, steps, ingredients, imageFileName);
+  const recipe = await createRecipeVersion(
+    req.params.id, version, name, description, introduction, steps, ingredients, imageFileName);
   return res.json({
     recipe
   });
@@ -78,7 +79,12 @@ router.put('/:id', AsyncHandler(async (req, res, next) => {
 }));
 
 router.post('/create', AsyncHandler(async (req, res, next) => {
-  let { name, description, steps, ingredients, imageURL } = req.body;
+  let { name,
+    description,
+    introduction,
+    steps,
+    ingredients, 
+    imageURL } = req.body;
   if (name == null) {
     return res.json({
       error: {

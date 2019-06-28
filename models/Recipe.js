@@ -77,13 +77,16 @@ export const incrementVersion = async (id) => {
   return res.rows[0].latest_version;
 }
 
-export const createRecipeVersion = async (recipe_id, version, name, description, steps, ingredients, image_file) => {
+export const createRecipeVersion = 
+  async (recipe_id, version, name, description, introduction, steps, ingredients, image_file) => {
   const client = await getClient();
 
   try {
     // create a new recipe version
-    const res = await client.query(`INSERT INTO cookbook.recipe_version (recipe_id, version, name, description, image_file)
-      VALUES ($1, $2, $3, $4, $5) RETURNING *`, [recipe_id, version, name, description, image_file]);
+    const res = await client.query(`INSERT INTO cookbook.recipe_version 
+      (recipe_id, version, name, description, introduction, image_file)
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, 
+      [recipe_id, version, name, description, introduction, image_file]);
     const rv = res.rows[0];
     // create each of the steps for that recipe version
     steps.forEach(async step => await client.query(`
