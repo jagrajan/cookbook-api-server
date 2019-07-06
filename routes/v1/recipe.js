@@ -117,7 +117,7 @@ router.post('/create', AsyncHandler(async (req, res, next) => {
 
   // create a recipe version
   const recipe_version = await createRecipeVersion(recipe.id, recipe.latest_version,
-    name, description, steps, ingredients, imageFileName);
+    name, description, introduction, steps, ingredients, imageFileName);
 
   return res.json({
     recipe: recipe_version

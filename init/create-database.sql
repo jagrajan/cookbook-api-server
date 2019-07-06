@@ -63,7 +63,7 @@ BEGIN;
   CREATE TABLE cookbook.ingredient (
     id        SERIAL PRIMARY KEY  NOT NULL,
     name      TEXT                NOT NULL,
-    plural    TEXT                NOT NULL,
+    plural    TEXT,
     unit      INTEGER             REFERENCES cookbook.unit(id),
     category  INTEGER             REFERENCES cookbook.ingredient_category(id)
   );
@@ -77,13 +77,14 @@ BEGIN;
   );
 
   CREATE TABLE cookbook.recipe_version (
-    id            SERIAL PRIMARY KEY,
-    name          TEXT                NOT NULL,
-    description   TEXT,
-    introduction  TEXT,
-    image_file    TEXT,
-    recipe_id     INTEGER             NOT NULL REFERENCES cookbook.recipe(id),
-    version       INTEGER             NOT NULL
+    id                    SERIAL PRIMARY KEY,
+    name                  TEXT                NOT NULL,
+    description           TEXT,
+    introduction          TEXT,
+    compiled_introduction TEXT,
+    image_file            TEXT,
+    recipe_id             INTEGER             NOT NULL REFERENCES cookbook.recipe(id),
+    version               INTEGER             NOT NULL
   );
 
   CREATE TABLE cookbook.recipe_category (

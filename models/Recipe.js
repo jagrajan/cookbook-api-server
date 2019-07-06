@@ -1,4 +1,5 @@
 import { query, getClient } from '../db';
+import pug from 'pug';
 
 export const getAllRecipes = async () => {
   const res = await query(`SELECT r.id, rv.name, rv.description, rv.introduction FROM cookbook.recipe r
@@ -24,6 +25,7 @@ export const getRecipe = async (id, slug = '') => {
     rv.name,
     rv.description,
     rv.introduction,
+    rv.compiled_introduction,
     rv.image_file
   FROM cookbook.recipe_version rv
   JOIN cookbook.recipe r
@@ -82,11 +84,13 @@ export const createRecipeVersion =
   const client = await getClient();
 
   try {
+    console.log(introduction);
+    console.log(pug.render(introduction));
     // create a new recipe version
     const res = await client.query(`INSERT INTO cookbook.recipe_version 
-      (recipe_id, version, name, description, introduction, image_file)
-      VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, 
-      [recipe_id, version, name, description, introduction, image_file]);
+      (recipe_id, version, name, description, introduction, compiled_introduction, image_file)
+      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
+      [recipe_id, version, name, description, introduction, pug.render(introduction), image_file]);
     const rv = res.rows[0];
     // create each of the steps for that recipe version
     steps.forEach(async step => await client.query(`
@@ -98,7 +102,8 @@ export const createRecipeVersion =
     ingredients.forEach(async i => {
       let ing = await client.query(`SELECT id FROM cookbook.ingredient WHERE name = $1`, [i.ingredient]);
       if (ing.rowCount == 0) {
-        ing = await client.query(`INSERT INTO cookbook.ingredient (name) VALUES ($1) RETURNING id`, [i.ingredient]);
+        ing = await client.query(`INSERT INTO cookbook.ingredient (name, plural) VALUES ($1, $2) RETURNING id`, 
+          [i.ingredient, i.ingredient]);
       }
       const ing_id = ing.rows[0].id;
       await client.query(`INSERT INTO cookbook.measured_ingredient (min_amount, max_amount, 
