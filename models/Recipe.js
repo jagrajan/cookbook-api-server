@@ -84,8 +84,7 @@ export const createRecipeVersion =
   const client = await getClient();
 
   try {
-    console.log(introduction);
-    console.log(pug.render(introduction));
+    await client.query('BEGIN');
     // create a new recipe version
     const res = await client.query(`INSERT INTO cookbook.recipe_version 
       (recipe_id, version, name, description, introduction, compiled_introduction, image_file)
@@ -99,17 +98,18 @@ export const createRecipeVersion =
     `, [rv.id, step.position, step.description]));
 
     // create all the ingredients for that recipe version
-    ingredients.forEach(async i => {
+    for (let c = 0; c < ingredients.length; c++) {
+      const i = ingredients[c];
       let ing = await client.query(`SELECT id FROM cookbook.ingredient WHERE name = $1`, [i.ingredient]);
       if (ing.rowCount == 0) {
         ing = await client.query(`INSERT INTO cookbook.ingredient (name, plural) VALUES ($1, $2) RETURNING id`, 
           [i.ingredient, i.ingredient]);
       }
       const ing_id = ing.rows[0].id;
-      await client.query(`INSERT INTO cookbook.measured_ingredient (min_amount, max_amount, 
+      const res = await client.query(`INSERT INTO cookbook.measured_ingredient (min_amount, max_amount, 
         position, ingredient_id, recipe_version_id, unit_id) VALUES ($1, $2, $3, $4, $5, $6)`,
         [i.minAmount, i.maxAmount, i.position, ing_id, rv.id, i.unit]);
-    });
+    }
     await client.query('COMMIT');
     return rv;
   } catch (e) {
