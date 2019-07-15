@@ -17,3 +17,12 @@ export const getDetails = async (user_id) => {
   const res = await query('SELECT * FROM users.profile WHERE id = $1', [user_id]);
   return res.rows[0];
 }
+
+export const makeAdmin =
+  async (user_id, expire_on = '1 year', master= false) => {
+  const sql = `INSERT INTO admin.admin (user_id, expire_on, master)
+    VALUES ($1, NOW() + $2::INTERVAL, $3)
+    RETURNING *`;
+  const res = await query(sql, [user_id, expire_on, master]);
+  return res.rows[0];
+};

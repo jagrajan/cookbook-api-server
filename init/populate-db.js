@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { createUser } = require('../models/User');
+const { createUser, makeAdmin } = require('../models/User');
 const { createIngredient } = require('../models/Ingredient');
 const { createUnit } = require('../models/Unit');
 const { createRecipe, createRecipeVersion } = require('../models/Recipe');
@@ -9,6 +9,8 @@ const populate = async () => {
   console.log('CREATING ADMINS');
   let id = await createUser('jag@jagrajan.com', 'password', 'jag');
   console.log(`Created user with id ${id}`);
+  let admin = await makeAdmin(id);
+  console.log(`User ${id} is now an admin`);
   id = await createUser('cat.holtz@hotmail.com', 'password', 'catherine');
   console.log(`Created user with id ${id}`);
 
