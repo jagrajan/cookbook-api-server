@@ -4,9 +4,10 @@ import path from 'path';
 import slugify from 'slugify';
 
 import { createImage } from '../../models/Image';
+import isAdminMiddleware from '../../middleware/isAdmin';
 
-import { 
-  createRecipe, 
+import {
+  createRecipe,
   getAllRecipes,
   getRecentlyUpdatedRecipes,
   getRecipe,
@@ -23,14 +24,25 @@ router.get('/', AsyncHandler(async (req, res, next) => {
 }));
 
 
+/*
+ * GET /v1/recipe/recently-updated
+ *
+ * Fetches recently updated recipes. Number of recipes returned depends on
+ * values of req.query.count.
+ */
 router.get('/recently-updated', AsyncHandler(async (req, res, next) => {
-  const recipes = await getRecentlyUpdatedRecipes(req.query.timestamp, req.query.count);
+  const recipes
+    = await getRecentlyUpdatedRecipes(req.query.timestamp, req.query.count);
   return res.json({
     recipes
   });
 }));
 
-
+/*
+ * GET /v1/recipe/:id
+ *
+ * Fetches recipe info for :id.
+ */
 router.get('/:id', AsyncHandler(async (req, res, next) => {
   let id = req.params.id;
   let slug = '';
@@ -47,8 +59,25 @@ router.get('/:id', AsyncHandler(async (req, res, next) => {
   return res.json({ error: 'not-found' });
 }));
 
-router.put('/:id', AsyncHandler(async (req, res, next) => {
-  let { name, description, introduction, steps, ingredients, imageURL } = req.body;
+/*
+ * PUT /v1/recipe/:id
+ *
+ * Updates recipe :id with provided request body.
+ *
+ * RESTRICTED ROUTE: admins only
+ */
+router.put('/:id', isAdminMiddleware, AsyncHandler(async (req, res, next) => {
+
+  // extract info from request body
+  let {
+    name,
+    description,
+    introduction,
+    steps,
+    ingredients,
+    imageURL } = req.body;
+
+  // parameter checking
   if (name == null) {
     return res.json({
       error: {
@@ -70,20 +99,40 @@ router.put('/:id', AsyncHandler(async (req, res, next) => {
   const imageFileName = path.basename(fullPath);
 
   const version = await incrementVersion(req.params.id);
-  const recipe = await createRecipeVersion(
-    req.params.id, version, name, description, introduction, steps, ingredients, imageFileName);
+  const recipe =
+    await createRecipeVersion(
+      req.params.id,
+      version,
+      name,
+      description,
+      introduction,
+      steps,
+      ingredients,
+      imageFileName
+    );
   return res.json({
     recipe
   });
 
 }));
 
-router.post('/create', AsyncHandler(async (req, res, next) => {
-  let { name,
+/*
+ * POST /v1/recipe/create
+ *
+ * Creates a recipe with the provided request body
+ *
+ * RESTRICTED ROUTE: admins only
+ */
+router.post('/create', isAdminMiddleware,
+  AsyncHandler(async (req, res, next) => {
+
+  // extra info from request body
+  let {
+    name,
     description,
     introduction,
     steps,
-    ingredients, 
+    ingredients,
     imageURL } = req.body;
   if (name == null) {
     return res.json({

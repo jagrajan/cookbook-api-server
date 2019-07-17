@@ -26,6 +26,11 @@ app.use(cookieSession({
 
 app.use(asyncHandler(authMiddleware));
 
+// app.use((req, res, next) => {
+  // console.log(req);
+  // next();
+// });
+
 app.use(router);
 
 app.use((req, res) => {
