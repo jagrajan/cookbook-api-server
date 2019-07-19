@@ -127,7 +127,10 @@ const populate = async () => {
         unit: cup_id
       }
     ],
-    'more_fud.jpg'
+    'more_fud.jpg',
+    '30 minutes',
+    '5 minutes',
+    2
   );
 
   // Creamy tomato pasta
@@ -269,7 +272,10 @@ const populate = async () => {
         unit: tbsp_id
       },
     ],
-    'bibsy-lies-down.png'
+    'bibsy-lies-down.png',
+    '20 minutes',
+    '15 minutes',
+    4
   );
 
 

@@ -83,6 +83,9 @@ BEGIN;
     introduction          TEXT,
     compiled_introduction TEXT,
     image_file            TEXT,
+    cook_time             TEXT,
+    prep_time             TEXT,
+    serves                INTEGER,
     recipe_id             INTEGER             NOT NULL REFERENCES cookbook.recipe(id),
     version               INTEGER             NOT NULL
   );

@@ -26,7 +26,10 @@ export const getRecipe = async (id, slug = '') => {
     rv.description,
     rv.introduction,
     rv.compiled_introduction,
-    rv.image_file
+    rv.image_file,
+    rv.cook_time,
+    rv.prep_time,
+    rv.serves
   FROM cookbook.recipe_version rv
   JOIN cookbook.recipe r
     ON r.id = rv.recipe_id
@@ -79,17 +82,37 @@ export const incrementVersion = async (id) => {
   return res.rows[0].latest_version;
 }
 
-export const createRecipeVersion = 
-  async (recipe_id, version, name, description, introduction, steps, ingredients, image_file) => {
+export const createRecipeVersion =
+  async (recipe_id, version, name, description, introduction, steps, ingredients, image_file, cook_time, prep_time, serves) => {
   const client = await getClient();
 
   try {
     await client.query('BEGIN');
     // create a new recipe version
-    const res = await client.query(`INSERT INTO cookbook.recipe_version 
-      (recipe_id, version, name, description, introduction, compiled_introduction, image_file)
-      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
-      [recipe_id, version, name, description, introduction, pug.render(introduction), image_file]);
+    const res = await client.query(`INSERT INTO cookbook.recipe_version(
+      recipe_id,
+      version,
+      name,
+      description,
+      introduction,
+      compiled_introduction,
+      image_file,
+      prep_time,
+      cook_time,
+      serves
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [
+        recipe_id,
+        version,
+        name,
+        description,
+        introduction,
+        pug.render(introduction),
+        image_file,
+        prep_time,
+        cook_time,
+        serves
+      ]);
     const rv = res.rows[0];
     // create each of the steps for that recipe version
     steps.forEach(async step => await client.query(`
