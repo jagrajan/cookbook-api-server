@@ -78,7 +78,8 @@ router.put('/:id', isAdminMiddleware, AsyncHandler(async (req, res, next) => {
     imageURL,
     cook_time,
     prep_time,
-    serves} = req.body;
+    serves
+  } = req.body;
 
   // parameter checking
   if (name == null) {
@@ -142,7 +143,8 @@ router.post('/create', isAdminMiddleware,
     imageURL,
     cook_time,
     prep_time,
-    serves} = req.body;
+    serves
+  } = req.body;
   if (name == null) {
     return res.json({
       error: {
