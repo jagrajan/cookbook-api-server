@@ -39,7 +39,7 @@ const populate = async () => {
   const tbsp_id = await createUnit('tbsp', 'tbsp');
   const hf_id = await createUnit('handful', 'handfuls');
   const pinch_id = await createUnit('pinch', 'pinches');
-  const ml_id = await createUnit('can', 'cans');
+  const ml_id = await createUnit('ml', 'ml');
   const gram_id = await createUnit('gram', 'grams');
 
   const pumpkin_alfredo = await createRecipe('pumpkin-alfredo');
