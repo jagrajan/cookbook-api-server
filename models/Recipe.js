@@ -19,7 +19,7 @@ export const getRecentlyUpdatedRecipes = async (timestamp, count) => {
 };
 
 export const getRecipe = async (id, slug = '') => {
-  const res = await query(`SELECT 
+  const res = await query(`SELECT
     rv.recipe_id AS id,
     rv.id AS recipe_version_id,
     rv.name,
@@ -41,7 +41,7 @@ export const getRecipe = async (id, slug = '') => {
     const steps_res = await query(`SELECT * FROM cookbook.recipe_step
       WHERE recipe_version_id = $1 ORDER BY position ASC`, [recipe.recipe_version_id]);
     const steps = steps_res.rows;
-    const ingredients_res = await query (`SELECT 
+    const ingredients_res = await query (`SELECT
         m.min_amount,
         m.max_amount,
         m.unit_id,
@@ -55,10 +55,20 @@ export const getRecipe = async (id, slug = '') => {
       JOIN cookbook.unit u ON u.id = m.unit_id
       WHERE recipe_version_id = $1 ORDER BY position ASC`, [recipe.recipe_version_id]);
     const ingredients = ingredients_res.rows;
+    const notes_res = await query(`
+      SELECT
+        position,
+        text
+      FROM cookbook.recipe_note
+      WHERE recipe_version_id = $1 AND global = TRUE
+      ORDER BY position ASC
+    `, [recipe.recipe_version_id]);
+    const notes = notes_res.rows;
     return {
       ...recipe,
       steps,
-      ingredients
+      ingredients,
+      notes
     };
   }
   return false;
@@ -77,13 +87,26 @@ export const createRecipe = async (slug) => {
 };
 
 export const incrementVersion = async (id) => {
-  const res = await query(`UPDATE cookbook.recipe SET latest_version = latest_version + 1 
+  const res = await query(`UPDATE cookbook.recipe SET latest_version = latest_version + 1
     WHERE id = $1 RETURNING latest_version`, [id]);
   return res.rows[0].latest_version;
 }
 
 export const createRecipeVersion =
-  async (recipe_id, version, name, description, introduction, steps, ingredients, image_file, cook_time, prep_time, serves) => {
+  async (
+    recipe_id,
+    version,
+    name,
+    description,
+    introduction,
+    steps,
+    ingredients,
+    image_file,
+    cook_time,
+    prep_time,
+    serves,
+    notes
+  ) => {
   const client = await getClient();
 
   try {
@@ -115,23 +138,49 @@ export const createRecipeVersion =
       ]);
     const rv = res.rows[0];
     // create each of the steps for that recipe version
-    steps.forEach(async step => await client.query(`
-      INSERT INTO cookbook.recipe_step (recipe_version_id, position, description)
-        VALUES ($1, $2, $3)
-    `, [rv.id, step.position, step.description]));
+    steps.forEach(async step => await client.query(
+      `INSERT INTO cookbook.recipe_step (
+        recipe_version_id,
+        position,
+        description
+      ) VALUES ($1, $2, $3) `,
+      [rv.id, step.position, step.description]));
 
     // create all the ingredients for that recipe version
     for (let c = 0; c < ingredients.length; c++) {
       const i = ingredients[c];
-      let ing = await client.query(`SELECT id FROM cookbook.ingredient WHERE name = $1`, [i.ingredient]);
+      let ing = await client.query(
+        `SELECT id FROM cookbook.ingredient WHERE name = $1`, [i.ingredient]);
       if (ing.rowCount == 0) {
-        ing = await client.query(`INSERT INTO cookbook.ingredient (name, plural) VALUES ($1, $2) RETURNING id`, 
+        ing = await client.query(
+          `INSERT INTO cookbook.ingredient (name, plural)
+          VALUES ($1, $2) RETURNING id`,
           [i.ingredient, i.ingredient]);
       }
       const ing_id = ing.rows[0].id;
-      const res = await client.query(`INSERT INTO cookbook.measured_ingredient (min_amount, max_amount, 
-        position, ingredient_id, recipe_version_id, unit_id) VALUES ($1, $2, $3, $4, $5, $6)`,
+      const res = await client.query(
+        `INSERT INTO cookbook.measured_ingredient (
+          min_amount,
+          max_amount,
+          position,
+          ingredient_id,
+          recipe_version_id,
+          unit_id)
+        VALUES ($1, $2, $3, $4, $5, $6)`,
         [i.minAmount, i.maxAmount, i.position, ing_id, rv.id, i.unit]);
+    }
+
+    // add notes for recipe version
+    for (let c = 0; c < notes.length; c++) {
+      const n =  notes[c];
+      const res = await client.query(`INSERT INTO cookbook.recipe_note(
+        recipe_id,
+        recipe_version_id,
+        global,
+        position,
+        text
+      ) VALUES ($1, $2, $3, $4, $5)`,
+      [rv.recipe_version, rv.id, true, n.position, n.text]);
     }
     await client.query('COMMIT');
     return rv;

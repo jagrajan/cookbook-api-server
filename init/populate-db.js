@@ -32,6 +32,18 @@ const populate = async () => {
   const margarine_id = await createIngredient('margarine', 'margarine');
   const half_and_half_id = await createIngredient('half and half', 'half and half');
   const pumpkin_puree_id = await createIngredient('pumpkin purée', 'pumpkin purée');
+  const ground_chicken_or_turkey_id = await createIngredient('ground chicken or turkey', 'ground chicken or turkey');
+  const broth_id = await createIngredient('broth', 'broth');
+  const chilli_powder_id = await createIngredient('chilli powder', 'chilli powder');
+  const cumin_id = await createIngredient('cumin', 'cumin');
+  const salt_id = await createIngredient('salt', 'salt');
+  const pepper_id = await createIngredient('pepper', 'pepper');
+  const pinto_beans_id = await createIngredient('pinto beans', 'pinto beans');
+  const kidney_beans_id = await createIngredient('kidney beans' , 'kidney beans');
+  const carrot_id = await createIngredient('carrot', 'carrots');
+  const water_id = await createIngredient('water', 'water');
+  const corn_starch_id = await createIngredient('corn strach', 'corn starch');
+
 
   const no_unit_id = await createUnit('', '');
   const cup_id = await createUnit('cup', 'cups');
@@ -130,7 +142,195 @@ const populate = async () => {
     'more_fud.jpg',
     '30 minutes',
     '5 minutes',
-    2
+    2,
+    [
+      {
+        position: 1,
+        text: 'Don\'t burn the food!'
+      }
+    ]
+  );
+
+  // instant pot chili
+  const instant_pot_chili = await createRecipe('instant-pot-chili');
+  const instant_pot_chili_version = await createRecipeVersion(
+    instant_pot_chili.id,
+    instant_pot_chili.latest_version,
+    'Instant Pot Chili',
+    'Fast and easy chili!',
+    'p This is so easy, like so easy!',
+    [
+      {
+        position: 1,
+        description: 'Dice the onion.'
+      },
+      {
+        position: 2,
+        description: 'Grate the carrots.'
+      },
+      {
+        position: 3,
+        description: 'Turn the instant pot to sauté (normal). Add olive oil until inner pot bottom is covered.'
+      },
+      {
+        position: 4,
+        description: 'When oil is hot, add ground meat and onion. Sauté and turkey until turkey is cooked.'
+      },
+      {
+        position: 5,
+        description: 'Add remaining ingredients in layers without stirring. Spread layers with wooden spoon as necessary. Ensure diced tomatoes and tomato paste are on top.'
+      },
+      {
+        position: 6,
+        description: 'Close instant pot lid and turn valve to "sealing". Set instant pot to manual (high, normal) for 25 minutes.'
+      },
+      {
+        position: 7,
+        description: 'Allow to natural release for 10 minutes. Release remaining steam.'
+      },
+      {
+        position: 8,
+        description: 'If not thick enough, whisk together cornstarch and water. Whisk into chili and allow 5-10 minutes to thicken.'
+      }
+    ],
+    [
+      {
+        position: 1,
+        ingredient: 'olive oil',
+        minAmount: null,
+        maxAmount: null,
+        unit: no_unit_id
+      },
+      {
+        position: 2,
+        ingredient: 'ground chicken or turkey',
+        minAmount: 450,
+        maxAmount: 450,
+        unit: gram_id
+      },
+      {
+        position: 3,
+        ingredient: 'medium onion',
+        minAmount: 1,
+        maxAmount: 1,
+        unit: no_unit_id
+      },
+      {
+        position: 4,
+        ingredient: 'broth',
+        minAmount: 1.5,
+        maxAmount: 1.5,
+        unit: cup_id
+      },
+      {
+        position: 5,
+        ingredient: 'chilli powder',
+        minAmount: 2,
+        maxAmount: 2,
+        unit: tbsp_id
+      },
+      {
+        position: 6,
+        ingredient: 'cumin',
+        minAmount: 0.5,
+        maxAmount: 0.5,
+        unit: tsp_id
+      },
+      {
+        position: 7,
+        ingredient: 'paprika',
+        minAmount: 1,
+        maxAmount: 1,
+        unit: tsp_id
+      },
+      {
+        position: 8,
+        ingredient: 'oregano',
+        minAmount: 1,
+        maxAmount: 1,
+        unit: tbsp_id
+      },
+      {
+        position: 9,
+        ingredient: 'salt',
+        minAmount: 0.5,
+        maxAmount: 0.5,
+        unit: tsp_id
+      },
+      {
+        position: 10,
+        ingredient: 'pepper',
+        minAmount: 0.5,
+        maxAmount: 0.5,
+        unit: tsp_id
+      },
+      {
+        position: 11,
+        ingredient: 'pinto beans',
+        minAmount: 540,
+        maxAmount: 540,
+        unit: ml_id
+      },
+      {
+        position: 12,
+        ingredient: 'kidney beans',
+        minAmount: 540,
+        maxAmount: 540,
+        unit: ml_id
+      },
+      {
+        position: 13,
+        ingredient: 'black beans',
+        minAmount: 540,
+        maxAmount: 540,
+        unit: ml_id
+      },
+      {
+        position: 14,
+        ingredient: 'diced tomatoes',
+        minAmount: 798,
+        maxAmount: 798,
+        unit: ml_id
+      },
+      {
+        position: 15,
+        ingredient: 'tomato paste',
+        minAmount: 150,
+        maxAmount: 150,
+        unit: ml_id
+      },
+      {
+        position: 16,
+        ingredient: 'carrot',
+        minAmount: 2,
+        maxAmount: 2,
+        unit: no_unit_id
+      },
+      {
+        position: 17,
+        ingredient: 'corn starch',
+        minAmount: 1,
+        maxAmount: 1,
+        unit: tbsp_id
+      },
+      {
+        position: 18,
+        ingredient: 'water',
+        minAmount: 1,
+        maxAmount: 1,
+        unit: tbsp_id
+      }
+    ],
+    'instant-pot-chili.jpg',
+    '10 minutes',
+    '30 minutes',
+    8,
+    [
+      {
+        position: 1,
+        text: 'Don\'t spoil the food!'
+      }
+    ]
   );
 
   // Creamy tomato pasta
@@ -272,10 +472,16 @@ const populate = async () => {
         unit: tbsp_id
       },
     ],
-    'bibsy-lies-down.png',
+    'creamy-tomato-pasta.jpg',
     '20 minutes',
     '15 minutes',
-    4
+    4,
+    [
+      {
+        position: 1,
+        text: 'Don\'t ruin the food!'
+      }
+    ]
   );
 
 

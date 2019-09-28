@@ -8,6 +8,7 @@ BEGIN;
   CREATE SCHEMA IF NOT EXISTS cookbook;
 
   DROP TABLE IF EXISTS cookbook.measured_ingredient;
+  DROP TABLE IF EXISTS cookbook.recipe_note;
   DROP TABLE IF EXISTS cookbook.recipe_step;
   DROP TABLE IF EXISTS cookbook.recipe_version;
   DROP TABLE IF EXISTS cookbook.ingredient;
@@ -33,7 +34,7 @@ BEGIN;
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
     email       TEXT                                        NOT NULL,
     password    TEXT                                        NOT NULL,
-    name        TEXT                                                
+    name        TEXT
   );
 
   CREATE TABLE users.auth_key (
@@ -52,7 +53,7 @@ BEGIN;
   CREATE TABLE cookbook.unit (
     id      SERIAL PRIMARY KEY  NOT NULL,
     name    TEXT,
-    plural  TEXT      
+    plural  TEXT
   );
 
   CREATE TABLE cookbook.ingredient_category (
@@ -103,13 +104,23 @@ BEGIN;
   );
 
   CREATE TABLE cookbook.measured_ingredient (
-    id                  SERIAL PRIMARY KEY,              
+    id                  SERIAL PRIMARY KEY,
     min_amount          TEXT,
     max_amount          TEXT,
     position            INTEGER,
     ingredient_id       INTEGER               REFERENCES cookbook.ingredient(id),
     recipe_version_id   INTEGER               REFERENCES cookbook.recipe_version(id),
     unit_id             INTEGER               REFERENCES cookbook.unit(id)
+  );
+
+  CREATE TABLE cookbook.recipe_note (
+    id                SERIAL PRIMARY KEY,
+    position          INTEGER,
+    recipe_id         INTEGER,
+    recipe_version_id INTEGER,
+    user_id           INTEGER,
+    global            BOOLEAN,
+    text              TEXT
   );
 
   DO $$
