@@ -78,7 +78,8 @@ router.put('/:id', isAdminMiddleware, AsyncHandler(async (req, res, next) => {
     imageURL,
     cook_time,
     prep_time,
-    serves
+    serves,
+    notes
   } = req.body;
 
   // parameter checking
@@ -115,7 +116,8 @@ router.put('/:id', isAdminMiddleware, AsyncHandler(async (req, res, next) => {
       imageFileName,
       cook_time,
       prep_time,
-      serves
+      serves,
+      notes
     );
   return res.json({
     recipe
@@ -143,7 +145,8 @@ router.post('/create', isAdminMiddleware,
     imageURL,
     cook_time,
     prep_time,
-    serves
+    serves,
+    notes
   } = req.body;
   if (name == null) {
     return res.json({
@@ -172,7 +175,7 @@ router.post('/create', isAdminMiddleware,
     lower: true
   });
 
-  // create the recipe 
+  // create the recipe
   const recipe = await createRecipe(slug);
 
   // create a recipe version
@@ -187,7 +190,9 @@ router.post('/create', isAdminMiddleware,
       imageFileName,
       cook_time,
       prep_time,
-      serves);
+      serves,
+      notes
+    );
 
   return res.json({
     recipe: recipe_version

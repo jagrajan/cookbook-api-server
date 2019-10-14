@@ -99,9 +99,9 @@ const populate = async () => {
       {
         position: 1,
         ingredient: 'large shell pasta',
-        minAmount: 350,
-        maxAmount: 350,
-        unit: gram_id
+        minAmount: 4,
+        maxAmount: 4,
+        unit: cup_id
       },
       {
         position: 2,
@@ -126,13 +126,20 @@ const populate = async () => {
       },
       {
         position: 5,
+        ingredient: 'half and half',
+        minAmount: 2.5,
+        maxAmount: 2.5,
+        unit: cup_id
+      },
+      {
+        position: 6,
         ingredient: 'pumpkin purée',
         minAmount: 1,
         maxAmount: 1,
         unit: cup_id
       },
       {
-        position: 6,
+        position: 7,
         ingredient: 'parmesan',
         minAmount: '1/2',
         maxAmount: '1/2',
