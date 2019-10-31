@@ -8,11 +8,14 @@ import isAdminMiddleware from '../../middleware/isAdmin';
 
 import {
   createRecipe,
+  createRecipeVersion,
+  fetchCustomNotes,
   getAllRecipes,
-  getRecentlyUpdatedRecipes,
   getRecipe,
+  getRecentlyUpdatedRecipes,
   incrementVersion,
-  createRecipeVersion } from '../../models/Recipe';
+  updateCustomNotes
+} from '../../models/Recipe';
 
 const router = Router();
 
@@ -197,6 +200,46 @@ router.post('/create', isAdminMiddleware,
   return res.json({
     recipe: recipe_version
   });
+}));
+
+/**
+ * GET /v1/recipe/custom-notes/:id
+ *
+ * Fetches the custom notes for the given recipe id. User id is retrieved from
+ * session data.
+ *
+ * RESTRICTED ROUTE: Only logged in users can access this route.
+ */
+router.get('/custom-notes/:id', AsyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return next();
+  }
+  const recipeId = req.params.id;
+  const userId = req.user.user_id;
+  const results = await fetchCustomNotes(recipeId, userId);
+  return res.json({
+    notes: results
+  });
+}));
+
+/**
+ * POST /v1/recipe/custom-notes/:id
+ *
+ * Overwrites the custom notes for the given user and recipe id.
+ *
+ * RESTRICTED ROUTE: Only logged in users can access this route.
+ */
+router.post('/custom-notes/:id', AsyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    next();
+  }
+
+  const recipeId = req.params.id;
+  const userId = req.user.user_id;
+  const { notes } = req.body;
+  const results = await updateCustomNotes(recipeId, userId, notes);
+  const { success } = results;
+  return res.json({ success: success, });
 }));
 
 export default router;

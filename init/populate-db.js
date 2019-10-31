@@ -3,11 +3,16 @@ require('dotenv').config();
 const { createUser, makeAdmin } = require('../models/User');
 const { createIngredient } = require('../models/Ingredient');
 const { createUnit } = require('../models/Unit');
-const { createRecipe, createRecipeVersion } = require('../models/Recipe');
+const {
+  createRecipe,
+  createRecipeVersion,
+  updateCustomNotes
+} = require('../models/Recipe');
 
 const populate = async () => {
   console.log('CREATING ADMINS');
   let id = await createUser('jag@jagrajan.com', 'password', 'jag');
+  const jag_id = id;
   console.log(`Created user with id ${id}`);
   let admin = await makeAdmin(id);
   console.log(`User ${id} is now an admin`);
@@ -491,8 +496,10 @@ const populate = async () => {
     ]
   );
 
-
-
+  await updateCustomNotes(pumpkin_alfredo.id, jag_id, [
+    { text: 'Measure in cups, not grams' },
+    { text: 'Tree fiddy grams yo' }
+  ]);
 }
 
 populate().catch(err => console.error(err)).finally(() => {

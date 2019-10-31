@@ -118,7 +118,7 @@ BEGIN;
     position          INTEGER,
     recipe_id         INTEGER,
     recipe_version_id INTEGER,
-    user_id           INTEGER,
+    user_id           UUID,
     global            BOOLEAN,
     text              TEXT
   );

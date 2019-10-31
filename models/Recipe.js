@@ -193,3 +193,56 @@ export const createRecipeVersion =
     client.release();
   }
 }
+
+
+/**
+ * Updates custom notes for a given recipe and user id.
+ *
+ * @param int     recipeId  Recipe to update custom notes for
+ * @param string  userId    User to update custom notes for
+ * @param array   notes     New set of notes for user
+ */
+export const updateCustomNotes = async (recipeId, userId, notes) => {
+  const deleteQuery = `
+    DELETE FROM cookbook.recipe_note
+    WHERE user_id = $1 AND recipe_id = $2
+  `;
+  const insertQuery = `
+    INSERT INTO cookbook.recipe_note(recipe_id, user_id, global, position, text)
+    VALUES ($1, $2, false, $3, $4)
+  `;
+
+  const client = await getClient();
+  let success = false;
+  try {
+    await client.query('BEGIN');
+    // delete old notes first
+    await client.query(deleteQuery, [userId, recipeId]);
+    notes.forEach(async note => await client.query(
+      insertQuery, [recipeId, userId, note.position, note.text]
+    ));
+    await client.query('COMMIT');
+    success = true;
+  } catch (e) {
+    client.query('ROLLBACK');
+  } finally {
+    client.release();
+  }
+  return { success };
+}
+
+/**
+ * Fetches custom notes for a given recipe and user id.
+ *
+ * @param int     recipeId  Recipe to fetch custom notes for
+ * @param string  userId    User to fetch custom notes for
+ * @return array List of user custom notes
+ */
+export const fetchCustomNotes = async (recipeId, userId) => {
+  const fetchQuery = `
+    SELECT text FROM cookbook.recipe_note
+    WHERE recipe_id = $1 AND user_id = $2
+  `;
+  const res = await query(fetchQuery, [recipeId, userId]);
+  return res.rows;
+}
