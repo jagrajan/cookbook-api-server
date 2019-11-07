@@ -6,7 +6,9 @@ const { createUnit } = require('../models/Unit');
 const {
   createRecipe,
   createRecipeVersion,
-  updateCustomNotes
+  fetchTags,
+  updateCustomNotes,
+  updateTags
 } = require('../models/Recipe');
 
 const populate = async () => {
@@ -500,6 +502,11 @@ const populate = async () => {
     { text: 'Measure in cups, not grams' },
     { text: 'Tree fiddy grams yo' }
   ]);
+
+
+  await updateTags(pumpkin_alfredo.id, ['yuumy', 'pasta', 'italian']);
+  const tags = await fetchTags(pumpkin_alfredo.id);
+  console.log(tags);
 }
 
 populate().catch(err => console.error(err)).finally(() => {

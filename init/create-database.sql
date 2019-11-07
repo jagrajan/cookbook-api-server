@@ -12,7 +12,8 @@ BEGIN;
   DROP TABLE IF EXISTS cookbook.recipe_step;
   DROP TABLE IF EXISTS cookbook.recipe_version;
   DROP TABLE IF EXISTS cookbook.ingredient;
-  DROP TABLE IF EXISTS cookbook.recipe_category;
+  DROP TABLE IF EXISTS cookbook.recipe_tag;
+  DROP TABLE IF EXISTS cookbook.tag;
   DROP TABLE IF EXISTS cookbook.ingredient_category;
   DROP TABLE IF EXISTS cookbook.unit;
   DROP TABLE IF EXISTS cookbook.recipe;
@@ -91,9 +92,15 @@ BEGIN;
     version               INTEGER             NOT NULL
   );
 
-  CREATE TABLE cookbook.recipe_category (
+  CREATE TABLE cookbook.tag (
     id    SERIAL PRIMARY KEY  NOT NULL,
-    name  TEXT                NOT NULL
+    text  TEXT                NOT NULL
+  );
+
+  CREATE TABLE cookbook.recipe_tag (
+    recipe_id INTEGER,
+    tag_id    INTEGER,
+    PRIMARY KEY(recipe_id, tag_id)
   );
 
   CREATE TABLE cookbook.recipe_step (

@@ -229,7 +229,7 @@ export const updateCustomNotes = async (recipeId, userId, notes) => {
     client.release();
   }
   return { success };
-}
+};
 
 /**
  * Fetches custom notes for a given recipe and user id.
@@ -245,4 +245,74 @@ export const fetchCustomNotes = async (recipeId, userId) => {
   `;
   const res = await query(fetchQuery, [recipeId, userId]);
   return res.rows;
-}
+};
+
+/**
+ * Updates the tags for a given recipeId.
+ *
+ * @param int   recipeId  Id of the recipe to update tags for
+ * @param array tags      New tags for the recipe
+ * @return  array New set of user tags
+ */
+export const updateTags = async (recipeId, tags) => {
+  const deleteQuery = `
+    DELETE FROM cookbook.recipe_tag
+    WHERE recipe_id = $1
+  `;
+  const insertTagQuery = `
+    INSERT INTO cookbook.tag(text)
+    SELECT $1
+    WHERE NOT EXISTS (
+      SELECT 1 FROM cookbook.tag
+      WHERE text = $1
+    )
+  `;
+  const insertRecipeTagQuery = `
+    WITH tag AS (
+      SELECT id FROM cookbook.tag
+      WHERE text = $1
+    )
+    INSERT INTO cookbook.recipe_tag (recipe_id, tag_id)
+    SELECT $2, tag.id
+    FROM tag
+  `;
+
+  const client = await getClient();
+  let success = false;
+  try {
+    await client.query('BEGIN');
+
+    // Delete all old tags
+    await client.query(deleteQuery, [recipeId]);
+
+    for (let i = 0; i < tags.length; i++) {
+      // Create tag if it doesn't exist
+      await client.query(insertTagQuery, [tags[i]]);
+
+      // Link the tag with the recipe
+      await client.query(insertRecipeTagQuery, [tags[i], recipeId]);
+    }
+    await client.query('COMMIT');
+    success = true;
+  } catch(e) {
+    await client.query('ROLLBACK');
+  } finally {
+    client.release();
+  }
+
+  return { success };
+};
+
+export const fetchTags = async recipeId => {
+  const fetchQuery  = `
+    SELECT t.text
+    FROM cookbook.recipe_tag r
+    JOIN cookbook.tag t
+      ON t.id = r.tag_id
+    WHERE r.recipe_id = $1
+  `;
+
+  const res = await query(fetchQuery, [recipeId]);
+  return res.rows;
+};
+
