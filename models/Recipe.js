@@ -64,11 +64,13 @@ export const getRecipe = async (id, slug = '') => {
       ORDER BY position ASC
     `, [recipe.recipe_version_id]);
     const notes = notes_res.rows;
+    const tags = await fetchTags(recipe.id);
     return {
       ...recipe,
       steps,
       ingredients,
-      notes
+      notes,
+      tags
     };
   }
   return false;
@@ -250,9 +252,9 @@ export const fetchCustomNotes = async (recipeId, userId) => {
 /**
  * Updates the tags for a given recipeId.
  *
- * @param int   recipeId  Id of the recipe to update tags for
- * @param array tags      New tags for the recipe
- * @return  array New set of user tags
+ * @param   int   recipeId  Id of the recipe to update tags for
+ * @param   array tags      New tags for the recipe
+ * @return  array           New set of user tags
  */
 export const updateTags = async (recipeId, tags) => {
   const deleteQuery = `
@@ -303,6 +305,12 @@ export const updateTags = async (recipeId, tags) => {
   return { success };
 };
 
+/**
+ * Fetch the tags for a given recipeId.
+ *
+ * @param   int   recipeId  Id of the rcipe
+ * @return  array           Set of tags for the recipe
+ */
 export const fetchTags = async recipeId => {
   const fetchQuery  = `
     SELECT t.text
